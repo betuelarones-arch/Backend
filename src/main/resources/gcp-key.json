@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "video-generator-478703",
+  "private_key_id": "4a4566a743b01a7c8cd451133e86ff9c6e6f0961",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC/YkYjbW/hOKqk\nHUOh6G+K01nU0yW648bTuOTTQiJevO4zcthS21ouYjCX1rn/0YjZxArcGFXAkve0\ng0vWyYuuJWtq2JBc+CMEgE24iLw6dA+Pef9PZTOHISUhSV6N0PI7U1+gjHvaM3LG\nDVJD9mSx/qdIUHCtnhbwcxy+OhIt6ktu3ipQ3MW2EaAKd0G0Pk26/CfL8CYM/1xG\ngBHiT0xgC2tWrKXYTAXhep/kQ4W9dbKwHlkBEDxb1zMzirbfMf9LFpdKAl3Z2neL\nmo0AMfJUrrT3xOVP/1WLWTXcM1/eZ/HgNVqtGgxt5vPoQosnYhlzGF9SK0DRETCk\n8+vcLXlJAgMBAAECggEAFgmgbvLql6IZUCWIhKvJsFAu/2lC5nbVDcs0Gjl60LLr\nsOPwEfZtN3saAln4+AKuQfknkPmCYlbqDBC0WmrB2U84w8hlMzdlfN6zVGT2W7rC\nkfBn3EIYgV5pMqCKsUTWp8stb0TN/C3BcRnWl7nXFYHvzE1q9CsIlC6FKEhykHO/\nVqPKJPcFjs79W5yHU41SneKHHXPlfU6+JZyQPh0iHHSw1Qw+f3B0M/3Vm79hzMEs\n17RsT2KxZoAectWTd0uArn72XhfEoRVD9PZZUQZ2nhY2iwZ7A9YsXAKu0Ej7o6KF\nTvPVGy1ETnu6pYVWz4XcRK7tCwmsPBvrVIrGFNAeAQKBgQD6jI0buRfR+f0aMlhk\nOyZ/7T7hmXIv7qAs7hfYLj+9LVKQ27iyQM6XuNkaJh87KpX1MoUDFm5oS502Yovh\nz7HyTvjyx/G1FRSSTxfBdJaG+e8FZK6+7eghO8cY2HOIntspuBwujvJ7W6NLmc2w\neaMwFEOY6NLJA0j6Uy44+sElgQKBgQDDjDLfcrybM44um5a79FAx+KWlluMFH2YJ\n95VuyW+9jQgn2b+J91untgD6eBL41OOWUEkod1g9WpXI8x8D2EH0mB9x9f4LgbGg\nBpR1o7vco4CeWb0my+PfRszbZERqHSndQfW4hlp3/mayDQT7WeqLLoSofh24llRm\nrZB8f8CHyQKBgA05S91RuJshiaVPUPEBWjfYSsBXe/phqtyUOHf1gPG4Kapxnl7y\nIrVJUVQa/Pz/c2i8oN6X2X3xt7t+GgnyD19NocAWo4A+O5a5S/Su9Z7sJBxxwvNa\n1Syj3g9GpVppoAGksQAYFV5DaOv9kyikUuOfvi2c5DstzDVCHKdvPLCBAoGAUioJ\ngiwCpa/O8TR87HKmc6jHaUFyGEfuJwf5qPhI1Dt7DsuGmKDvyRNHa/ah+h3xlsob\nQz6KPBVg1HObN5FZfT2iEM9MtGcFTHkXTirDF903gNGyEaggEkP8db62pGOmoIpD\nhgol3z9sxSmFS1unml2sbeO390RrKE2LZVSEgEkCgYAFVpxmBQAaWiPX1HBtV4XI\nj3/dptWRCp5VRkPJg+Nqy8DFiY/lg/dw0nnYoVUTKvU3yoT6Tq3B0nngbEVMlOHD\nkyCB/7MnoiG+IR5iKHDe928SXjl0hJNYITYvS3LjYebEmAcGgJNBXXm7a9l8PODC\nzU+A/jqJHSd/YWc3kJxCgQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "betuel-arones-tecsup-edu-p-664@video-generator-478703.iam.gserviceaccount.com",
+  "client_id": "107383934122155894079",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/betuel-arones-tecsup-edu-p-664%40video-generator-478703.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
