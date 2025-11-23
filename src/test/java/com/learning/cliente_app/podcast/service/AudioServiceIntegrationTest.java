@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
  * Pruebas de generación de audio desde texto con OpenAI.
  * Patrón: @SpringBootTest + @Slf4j + try-catch + assertions
  */
-@SpringBootTest
+import com.learning.cliente_app.ClienteAppApplication;
+
+@SpringBootTest(classes = ClienteAppApplication.class)
 @Slf4j
 public class AudioServiceIntegrationTest {
 
@@ -213,7 +215,7 @@ public class AudioServiceIntegrationTest {
     @Test
     public void testOpenAIModelosTTS() {
         String[] modelos = {
-                "gpt-4o-mini-tts",  // Modelo usado en el servicio
+                "gpt-4o-mini-tts", // Modelo usado en el servicio
                 "text-to-speech-1",
                 "tts-1-hd"
         };
@@ -237,7 +239,7 @@ public class AudioServiceIntegrationTest {
     @Test
     public void testVocesDisponibles() {
         String[] voces = {
-                "alloy",    // Voz usada en el servicio
+                "alloy", // Voz usada en el servicio
                 "echo",
                 "fable",
                 "onyx",

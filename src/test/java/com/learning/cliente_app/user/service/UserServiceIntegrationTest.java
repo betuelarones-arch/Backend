@@ -4,26 +4,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
+import com.learning.cliente_app.ClienteAppApplication;
 import com.learning.cliente_app.user.dto.UsuarioDTO;
 import com.learning.cliente_app.user.model.UserEntity;
 import com.learning.cliente_app.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Test de integración para UserService.
- * Pruebas de registro, login, recuperación de contraseña y verificación de token.
- * Patrón: @SpringBootTest + @Slf4j + try-catch + assertions explícitos
- */
-@SpringBootTest
+@SpringBootTest(classes = ClienteAppApplication.class)
 @Slf4j
 public class UserServiceIntegrationTest {
 
@@ -38,9 +41,6 @@ public class UserServiceIntegrationTest {
 
     // ==================== PRUEBAS DE REGISTRO ====================
 
-    /**
-     * Test: Registrar un nuevo usuario exitosamente
-     */
     @Test
     public void testRegistrarUsuario() {
         String NAME = "Juan";
@@ -55,7 +55,8 @@ public class UserServiceIntegrationTest {
 
             UsuarioDTO newUser = this.userService.registrarUsuario(userDTO);
 
-            log.info("USUARIO REGISTRADO: ID={}, Email={}, Name={}", newUser.getId(), newUser.getEmail(), newUser.getName());
+            log.info("USUARIO REGISTRADO: ID={}, Email={}, Name={}", newUser.getId(), newUser.getEmail(),
+                    newUser.getName());
 
             assertNotNull(newUser.getId(), "ID no debe ser nulo");
             assertEquals(EMAIL, newUser.getEmail(), "Email debe coincidir");
@@ -67,16 +68,12 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: No permitir registrar usuario con correo duplicado
-     */
     @Test
     public void testRegistrarUsuarioDuplicado() {
         String EMAIL = "duplicate@example.com";
         String PASSWORD = "SecurePass123";
 
         try {
-            // Primer registro
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName("Carlos");
             userDTO.setEmail(EMAIL);
@@ -85,7 +82,6 @@ public class UserServiceIntegrationTest {
             UsuarioDTO firstUser = this.userService.registrarUsuario(userDTO);
             log.info("Primer usuario registrado: ID={}", firstUser.getId());
 
-            // Intento duplicado
             UsuarioDTO duplicateDTO = new UsuarioDTO();
             duplicateDTO.setName("Otro");
             duplicateDTO.setEmail(EMAIL);
@@ -105,9 +101,6 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: No permitir registro con email vacío
-     */
     @Test
     public void testRegistrarUsuarioSinEmail() {
         try {
@@ -132,9 +125,6 @@ public class UserServiceIntegrationTest {
 
     // ==================== PRUEBAS DE LOGIN ====================
 
-    /**
-     * Test: Login con credenciales correctas
-     */
     @Test
     public void testLoginExitoso() {
         String NAME = "María";
@@ -142,7 +132,6 @@ public class UserServiceIntegrationTest {
         String PASSWORD = "MyPassword123";
 
         try {
-            // Registrar usuario
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName(NAME);
             userDTO.setEmail(EMAIL);
@@ -151,7 +140,6 @@ public class UserServiceIntegrationTest {
             UsuarioDTO registeredUser = this.userService.registrarUsuario(userDTO);
             log.info("Usuario registrado para login: Email={}", registeredUser.getEmail());
 
-            // Intentar login
             UsuarioDTO loginUser = this.userService.loginUsuario(EMAIL, PASSWORD);
 
             log.info("LOGIN EXITOSO para: Email={}, Name={}", loginUser.getEmail(), loginUser.getName());
@@ -166,9 +154,6 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: Login con contraseña incorrecta
-     */
     @Test
     public void testLoginContraseñaIncorrecta() {
         String EMAIL = "wrongpass@example.com";
@@ -176,7 +161,6 @@ public class UserServiceIntegrationTest {
         String WRONG_PASSWORD = "WrongPassword";
 
         try {
-            // Registrar usuario
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName("Test");
             userDTO.setEmail(EMAIL);
@@ -185,16 +169,15 @@ public class UserServiceIntegrationTest {
             this.userService.registrarUsuario(userDTO);
             log.info("Usuario registrado para prueba de contraseña incorrecta");
 
-            // Intentar login con contraseña incorrecta
             try {
                 this.userService.loginUsuario(EMAIL, WRONG_PASSWORD);
                 fail("Debería haber rechazado contraseña incorrecta");
             } catch (IllegalArgumentException e) {
                 log.info("Contraseña incorrecta rechazada: {}", e.getMessage());
-                assertTrue(e.getMessage().toLowerCase().contains("credenciales") || 
-                          e.getMessage().toLowerCase().contains("contraseña") ||
-                          e.getMessage().toLowerCase().contains("inválid"),
-                    "Excepción debe mencionar credenciales");
+                assertTrue(e.getMessage().toLowerCase().contains("credenciales") ||
+                        e.getMessage().toLowerCase().contains("contraseña") ||
+                        e.getMessage().toLowerCase().contains("inválid"),
+                        "Excepción debe mencionar credenciales");
             }
 
         } catch (Exception e) {
@@ -203,9 +186,6 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: Login con usuario no existente
-     */
     @Test
     public void testLoginUsuarioNoExistente() {
         String NON_EXISTENT_EMAIL = "noexiste@example.com";
@@ -216,7 +196,7 @@ public class UserServiceIntegrationTest {
             fail("Debería haber lanzado excepción de usuario no encontrado");
         } catch (IllegalArgumentException e) {
             log.info("Usuario no encontrado rechazado: {}", e.getMessage());
-            assertTrue(e.getMessage().toLowerCase().contains("no encontrado"), 
+            assertTrue(e.getMessage().toLowerCase().contains("no encontrado"),
                     "Excepción debe mencionar 'no encontrado'");
         } catch (Exception e) {
             log.error("Tipo de excepción inesperado: {}", e.getClass().getName());
@@ -224,9 +204,6 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: Login sin email
-     */
     @Test
     public void testLoginSinEmail() {
         try {
@@ -238,9 +215,6 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: Login sin contraseña
-     */
     @Test
     public void testLoginSinPassword() {
         try {
@@ -252,18 +226,15 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    // ==================== PRUEBAS DE VERIFICACIÓN DE CONTRASEÑA ====================
+    // ==================== PRUEBAS DE VERIFICACIÓN DE CONTRASEÑA
+    // ====================
 
-    /**
-     * Test: Verificar que contraseña está en BCrypt en la BD
-     */
     @Test
     public void testVerifyPasswordIsBCrypted() {
         String EMAIL = "bcrypt@example.com";
         String PASSWORD = "PlainPassword123";
 
         try {
-            // Registrar usuario
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName("Test");
             userDTO.setEmail(EMAIL);
@@ -272,16 +243,13 @@ public class UserServiceIntegrationTest {
             this.userService.registrarUsuario(userDTO);
             log.info("Usuario registrado para verificación de BCrypt");
 
-            // Verificar que en BD está hasheada
             Optional<UserEntity> userEntity = userRepository.findByEmail(EMAIL);
 
             assertTrue(userEntity.isPresent(), "Usuario debe existir en BD");
             String hashedPassword = userEntity.get().getPasswordHash();
 
-            // BCrypt siempre empieza con $2
             assertTrue(hashedPassword.startsWith("$2"), "Contraseña debe estar en formato BCrypt");
 
-            // Verificar que la contraseña original coincide con el hash
             assertTrue(passwordEncoder.matches(PASSWORD, hashedPassword),
                     "Contraseña original debe coincidir con hash BCrypt");
 
@@ -295,16 +263,16 @@ public class UserServiceIntegrationTest {
 
     // ==================== PRUEBAS DE RECUPERACIÓN ====================
 
-    /**
-     * Test: Recuperación de contraseña (solo verifica que no lance excepción)
-     */
     @Test
     public void testRecuperarContrasena() {
         String EMAIL = "recovery@example.com";
         String PASSWORD = "InitialPass123";
 
-        try {
-            // Registrar usuario
+        try (MockedStatic<FirebaseAuth> mockedFirebaseAuth = Mockito.mockStatic(FirebaseAuth.class)) {
+            FirebaseAuth firebaseAuthMock = mock(FirebaseAuth.class);
+            mockedFirebaseAuth.when(FirebaseAuth::getInstance).thenReturn(firebaseAuthMock);
+            when(firebaseAuthMock.generatePasswordResetLink(anyString())).thenReturn("http://fake-link");
+
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName("Recovery User");
             userDTO.setEmail(EMAIL);
@@ -313,7 +281,6 @@ public class UserServiceIntegrationTest {
             this.userService.registrarUsuario(userDTO);
             log.info("Usuario registrado para prueba de recuperación");
 
-            // Solicitar recuperación
             this.userService.recuperarContrasena(EMAIL);
             log.info("Solicitud de recuperación enviada para: {}", EMAIL);
 
@@ -325,41 +292,44 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: Recuperación con email no existente
-     */
     @Test
     public void testRecuperarContraseñaEmailNoExistente() {
         String NON_EXISTENT_EMAIL = "nonexistent@example.com";
 
-        try {
-            // Solicitar recuperación
+        try (MockedStatic<FirebaseAuth> mockedFirebaseAuth = Mockito.mockStatic(FirebaseAuth.class)) {
+            FirebaseAuth firebaseAuthMock = mock(FirebaseAuth.class);
+            mockedFirebaseAuth.when(FirebaseAuth::getInstance).thenReturn(firebaseAuthMock);
+            when(firebaseAuthMock.generatePasswordResetLink(anyString())).thenReturn("http://fake-link");
+
             this.userService.recuperarContrasena(NON_EXISTENT_EMAIL);
             log.info("Recuperación solicitada para email no existente: {}", NON_EXISTENT_EMAIL);
-            
-            // Debería ejecutarse sin excepción (como práctica segura)
+
             assertTrue(true, "No debe lanzar excepción para email no existente");
 
         } catch (Exception e) {
             log.warn("Excepción en recuperación para email no existente: {}", e.getMessage());
-            // Algunos servicios lanzan excepción, otros no. Ambos son válidos.
             assertTrue(true);
         }
     }
 
     // ==================== PRUEBAS DE VERIFICACIÓN DE TOKEN ====================
 
-    /**
-     * Test: Verificación de usuario con token (simulado)
-     */
     @Test
     public void testVerificarUsuarioConToken() {
         String NAME = "Verified User";
         String EMAIL = "verify@example.com";
         String PASSWORD = "VerifyPass123";
+        String TOKEN = "test-token-valid";
 
-        try {
-            // Registrar usuario
+        try (MockedStatic<FirebaseAuth> mockedFirebaseAuth = Mockito.mockStatic(FirebaseAuth.class)) {
+            FirebaseAuth firebaseAuthMock = mock(FirebaseAuth.class);
+            FirebaseToken firebaseTokenMock = mock(FirebaseToken.class);
+
+            mockedFirebaseAuth.when(FirebaseAuth::getInstance).thenReturn(firebaseAuthMock);
+            when(firebaseAuthMock.verifyIdToken(anyString())).thenReturn(firebaseTokenMock);
+            when(firebaseTokenMock.getEmail()).thenReturn(EMAIL);
+            when(firebaseTokenMock.getName()).thenReturn(NAME);
+
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName(NAME);
             userDTO.setEmail(EMAIL);
@@ -368,18 +338,10 @@ public class UserServiceIntegrationTest {
             UsuarioDTO registeredUser = this.userService.registrarUsuario(userDTO);
             log.info("Usuario registrado para verificación: {}", registeredUser.getId());
 
-            // Verificar con token (token puede ser generado internamente o ser un string genérico)
-            String TOKEN = "test-token-" + registeredUser.getId();
-            
-            try {
-                UsuarioDTO verifiedUser = this.userService.verificarUsuario(TOKEN);
-                log.info("Usuario verificado: Email={}", verifiedUser.getEmail());
-                assertNotNull(verifiedUser, "Usuario verificado no debe ser nulo");
-            } catch (Exception e) {
-                // Si el servicio no implementa tokens, esto es esperado
-                log.info("Verificación de token no implementada o token inválido: {}", e.getMessage());
-                assertTrue(true);
-            }
+            UsuarioDTO verifiedUser = this.userService.verificarUsuario(TOKEN);
+            log.info("Usuario verificado: Email={}", verifiedUser.getEmail());
+            assertNotNull(verifiedUser, "Usuario verificado no debe ser nulo");
+            assertEquals(EMAIL, verifiedUser.getEmail());
 
         } catch (Exception e) {
             log.error("Error en test de verificación: {}", e.getMessage(), e);
@@ -389,19 +351,19 @@ public class UserServiceIntegrationTest {
 
     // ==================== PRUEBAS DE FLUJO COMPLETO ====================
 
-    /**
-     * Test: Flujo completo (registro, login, recuperación)
-     */
     @Test
     public void testCompleteUserFlow() {
         String NAME = "Francisco";
         String EMAIL = "complete@example.com";
         String PASSWORD = "CompleteFlow123";
 
-        try {
+        try (MockedStatic<FirebaseAuth> mockedFirebaseAuth = Mockito.mockStatic(FirebaseAuth.class)) {
+            FirebaseAuth firebaseAuthMock = mock(FirebaseAuth.class);
+            mockedFirebaseAuth.when(FirebaseAuth::getInstance).thenReturn(firebaseAuthMock);
+            when(firebaseAuthMock.generatePasswordResetLink(anyString())).thenReturn("http://fake-link");
+
             log.info("=== INICIANDO FLUJO COMPLETO ===");
 
-            // 1. Registrar
             UsuarioDTO userDTO = new UsuarioDTO();
             userDTO.setName(NAME);
             userDTO.setEmail(EMAIL);
@@ -411,22 +373,18 @@ public class UserServiceIntegrationTest {
             log.info("1. USUARIO REGISTRADO: ID={}, Email={}", createdUser.getId(), createdUser.getEmail());
             assertNotNull(createdUser.getId(), "ID de usuario no debe ser nulo");
 
-            // 2. Verificar en BD
             Optional<UserEntity> dbUser = userRepository.findByEmail(EMAIL);
             assertTrue(dbUser.isPresent(), "Usuario debe existir en BD");
             log.info("2. USUARIO VERIFICADO EN BD: Email={}", dbUser.get().getEmail());
 
-            // 3. Login
             UsuarioDTO loginUser = this.userService.loginUsuario(EMAIL, PASSWORD);
             log.info("3. LOGIN EXITOSO: Email={}, Name={}", loginUser.getEmail(), loginUser.getName());
             assertNotNull(loginUser, "Usuario logueado no debe ser nulo");
             assertEquals(EMAIL, loginUser.getEmail(), "Email debe coincidir");
 
-            // 4. Recuperación de contraseña
             this.userService.recuperarContrasena(EMAIL);
             log.info("4. RECUPERACIÓN DE CONTRASEÑA SOLICITADA");
 
-            // 5. Verificación de BCrypt
             String hashedPassword = dbUser.get().getPasswordHash();
             assertTrue(hashedPassword.startsWith("$2"), "Contraseña debe estar en BCrypt");
             assertTrue(passwordEncoder.matches(PASSWORD, hashedPassword), "Contraseña debe coincidir");
@@ -441,19 +399,15 @@ public class UserServiceIntegrationTest {
         }
     }
 
-    /**
-     * Test: Múltiples usuarios simultáneamente
-     */
     @Test
     public void testMultipleUsersSimultaneously() {
-        String[] names = {"User1", "User2", "User3"};
-        String[] emails = {"user1@test.com", "user2@test.com", "user3@test.com"};
+        String[] names = { "User1", "User2", "User3" };
+        String[] emails = { "user1@test.com", "user2@test.com", "user3@test.com" };
         String password = "CommonPass123";
 
         try {
             log.info("=== REGISTRANDO MÚLTIPLES USUARIOS ===");
 
-            // Registrar 3 usuarios
             for (int i = 0; i < 3; i++) {
                 UsuarioDTO userDTO = new UsuarioDTO();
                 userDTO.setName(names[i]);
@@ -465,7 +419,6 @@ public class UserServiceIntegrationTest {
                 assertNotNull(registered.getId(), "ID no debe ser nulo para usuario " + (i + 1));
             }
 
-            // Verificar que todos existen
             for (int i = 0; i < 3; i++) {
                 UsuarioDTO loginUser = this.userService.loginUsuario(emails[i], password);
                 assertEquals(emails[i], loginUser.getEmail(), "Email debe coincidir para usuario " + (i + 1));

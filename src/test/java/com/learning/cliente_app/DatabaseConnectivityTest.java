@@ -9,7 +9,7 @@ import java.sql.Connection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(classes = ClienteAppApplication.class)
 public class DatabaseConnectivityTest {
 
     @Autowired

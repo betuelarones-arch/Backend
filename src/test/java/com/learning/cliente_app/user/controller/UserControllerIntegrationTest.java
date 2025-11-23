@@ -12,7 +12,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+import com.learning.cliente_app.ClienteAppApplication;
+
+@SpringBootTest(classes = ClienteAppApplication.class)
 @AutoConfigureMockMvc
 public class UserControllerIntegrationTest {
 
@@ -24,16 +26,16 @@ public class UserControllerIntegrationTest {
 
     @Test
     void registerAndLoginFlow_shouldReturn200AndUserFields() throws Exception {
-    // Build JSON payload explicitly so WRITE_ONLY password is included
-    var payload = objectMapper.createObjectNode();
-    payload.put("name", "Prueba");
-    payload.put("email", "prueba@example.com");
-    payload.put("password", "secreto123");
+        // Build JSON payload explicitly so WRITE_ONLY password is included
+        var payload = objectMapper.createObjectNode();
+        payload.put("name", "Prueba");
+        payload.put("email", "prueba@example.com");
+        payload.put("password", "secreto123");
 
-    // Register
-    mockMvc.perform(post("/api/usuarios/register")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(payload)))
+        // Register
+        mockMvc.perform(post("/api/usuarios/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value("prueba@example.com"))
                 .andExpect(jsonPath("$.name").value("Prueba"));

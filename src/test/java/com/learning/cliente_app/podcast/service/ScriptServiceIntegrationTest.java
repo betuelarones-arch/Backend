@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
  * Pruebas de generación de guiones desde texto o prompts.
  * Patrón: @SpringBootTest + @Slf4j + try-catch + assertions
  */
-@SpringBootTest
+import com.learning.cliente_app.ClienteAppApplication;
+
+@SpringBootTest(classes = ClienteAppApplication.class)
 @Slf4j
 public class ScriptServiceIntegrationTest {
 
@@ -29,15 +31,15 @@ public class ScriptServiceIntegrationTest {
 
         try {
             log.info("Generando script desde texto base");
-            
+
             try {
                 String resultado = scriptService.generateScript(TEXTO);
-                log.info("SCRIPT GENERADO: {} caracteres", 
-                    resultado != null ? resultado.length() : 0);
-                
+                log.info("SCRIPT GENERADO: {} caracteres",
+                        resultado != null ? resultado.length() : 0);
+
                 assertNotNull(resultado, "Script no debe ser nulo");
                 assertTrue(resultado.length() > 0, "Script debe tener contenido");
-                
+
             } catch (RuntimeException e) {
                 log.info("Error de API (esperado sin key válida): {}", e.getMessage());
                 assertTrue(true);
@@ -58,14 +60,14 @@ public class ScriptServiceIntegrationTest {
 
         try {
             log.info("Generando script desde prompt");
-            
+
             try {
                 String resultado = scriptService.generateScriptFromPrompt(PROMPT);
-                log.info("SCRIPT DESDE PROMPT: {} caracteres", 
-                    resultado != null ? resultado.length() : 0);
-                
+                log.info("SCRIPT DESDE PROMPT: {} caracteres",
+                        resultado != null ? resultado.length() : 0);
+
                 assertNotNull(resultado, "Script no debe ser nulo");
-                
+
             } catch (RuntimeException e) {
                 log.info("Error de API: {}", e.getMessage());
                 assertTrue(true);
@@ -136,8 +138,8 @@ public class ScriptServiceIntegrationTest {
 
             try {
                 String resultado = scriptService.generateScript(TEXTO_LARGO);
-                log.info("Script largo generado: {} caracteres", 
-                    resultado != null ? resultado.length() : 0);
+                log.info("Script largo generado: {} caracteres",
+                        resultado != null ? resultado.length() : 0);
                 assertTrue(true);
             } catch (RuntimeException e) {
                 log.info("Texto largo procesado o rechazado: {}", e.getMessage());
@@ -212,17 +214,17 @@ public class ScriptServiceIntegrationTest {
         try {
             try {
                 String script = scriptService.generateScript(TEMA);
-                
+
                 if (script != null) {
                     log.info("Script recibido: {} caracteres", script.length());
-                    
+
                     // Verificar que no es vacío
                     assertTrue(script.length() > 0, "Script no debe estar vacío");
-                    
+
                     // Verificar que contiene contenido válido
                     assertTrue(!script.equals(""), "Script debe tener contenido");
                 }
-                
+
             } catch (RuntimeException e) {
                 log.info("Error esperado de API: {}", e.getMessage());
                 assertTrue(true);
