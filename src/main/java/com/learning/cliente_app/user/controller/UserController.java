@@ -50,16 +50,38 @@ public class UserController {
 
     // Endpoint para login con Firebase con correo electrónico
     @PostMapping("/firebase-login")
-    public ResponseEntity<FirebaseLoginResponse> firebaseLogin(@RequestHeader("Authorization") String authorizationHeader) throws Exception {
+    public ResponseEntity<FirebaseLoginResponse> firebaseLogin(
+            @RequestHeader("Authorization") String authorizationHeader) throws Exception {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         String idToken = authorizationHeader.replace("Bearer ", "").trim();
-        com.google.firebase.auth.FirebaseToken decodedToken = com.google.firebase.auth.FirebaseAuth.getInstance().verifyIdToken(idToken);
+        com.google.firebase.auth.FirebaseToken decodedToken = com.google.firebase.auth.FirebaseAuth.getInstance()
+                .verifyIdToken(idToken);
         String uid = decodedToken.getUid();
         String email = decodedToken.getEmail();
         FirebaseLoginResponse resp = new FirebaseLoginResponse(uid, email);
         return ResponseEntity.ok(resp);
+    }
+
+    // Reportar error o soporte
+    @PostMapping("/support")
+    public ResponseEntity<String> reportError(@RequestBody SupportRequest request) {
+        logger.info("Support message received: {}", request.getDescription());
+        // Aquí podrías almacenar el mensaje o enviarlo por email
+        return ResponseEntity.ok("Mensaje de soporte recibido");
+    }
+
+    public static class SupportRequest {
+        private String description;
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
     }
 
     // Small request/response DTOs for controller endpoints
@@ -67,17 +89,33 @@ public class UserController {
         private String email;
         private String password;
 
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 
     public static class RecoverRequest {
         private String email;
 
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 
     public static class FirebaseLoginResponse {
@@ -89,8 +127,13 @@ public class UserController {
             this.email = email;
         }
 
-        public String getUid() { return uid; }
-        public String getEmail() { return email; }
+        public String getUid() {
+            return uid;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 
 }

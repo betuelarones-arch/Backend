@@ -12,6 +12,7 @@ This repository contains the backend application for the learning platform. Belo
 | POST | `/recover` | Password recovery |
 | GET | `/verify` | Verify user via token |
 | POST | `/firebase-login` | Login with Firebase token |
+| POST | `/support` | Report an error or support message |
 
 ### 📂 Resources (`/api/recursos`)
 | Method | Endpoint | Description |
