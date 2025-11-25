@@ -4,15 +4,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.learning.cliente_app.user.service.UserService;
 import com.learning.cliente_app.user.dto.UsuarioDTO;
+import com.learning.cliente_app.user.dto.LoginRequest;
+import com.learning.cliente_app.user.dto.RecoverRequest;
+import com.learning.cliente_app.user.dto.FirebaseLoginResponse;
+import com.learning.cliente_app.user.dto.SupportRequest;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public UserController(UserService userService) {
@@ -70,70 +79,6 @@ public class UserController {
         logger.info("Support message received: {}", request.getDescription());
         // Aquí podrías almacenar el mensaje o enviarlo por email
         return ResponseEntity.ok("Mensaje de soporte recibido");
-    }
-
-    public static class SupportRequest {
-        private String description;
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-    }
-
-    // Small request/response DTOs for controller endpoints
-    public static class LoginRequest {
-        private String email;
-        private String password;
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
-
-    public static class RecoverRequest {
-        private String email;
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-    }
-
-    public static class FirebaseLoginResponse {
-        private String uid;
-        private String email;
-
-        public FirebaseLoginResponse(String uid, String email) {
-            this.uid = uid;
-            this.email = email;
-        }
-
-        public String getUid() {
-            return uid;
-        }
-
-        public String getEmail() {
-            return email;
-        }
     }
 
 }
