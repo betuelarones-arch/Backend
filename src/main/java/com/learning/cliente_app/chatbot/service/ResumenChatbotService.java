@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class ResumenService {
+public class ResumenChatbotService {
 
     @Value("${gemini.api.key}")
     private String GEMINI_API_KEY;
@@ -25,7 +25,7 @@ public class ResumenService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ResumenService(ExtractService extractService, RestTemplate restTemplate) {
+    public ResumenChatbotService(ExtractService extractService, RestTemplate restTemplate) {
         this.extractService = extractService;
         this.restTemplate = restTemplate;
     }
