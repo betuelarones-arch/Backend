@@ -1,4 +1,4 @@
-package com.learning.cliente_app.resumen.service;
+package com.learning.cliente_app.chatbot.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

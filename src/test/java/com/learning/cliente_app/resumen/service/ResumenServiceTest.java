@@ -39,7 +39,8 @@ public class ResumenServiceTest {
     @Test
     void resumirTexto_Success() {
         String texto = "Texto de prueba";
-        String mockResponse = "{\"choices\": [{\"message\": {\"content\": \"Resumen generado\"}}]}";
+        // Formato de respuesta de Gemini API
+        String mockResponse = "{\"candidates\": [{\"content\": {\"parts\": [{\"text\": \"Resumen generado\"}]}}]}";
 
         when(restTemplate.exchange(
                 anyString(),
@@ -60,7 +61,8 @@ public class ResumenServiceTest {
     @Test
     void resumirArchivo_Success() throws Exception {
         String extractedText = "Contenido del archivo";
-        String mockResponse = "{\"choices\": [{\"message\": {\"content\": \"Resumen de archivo\"}}]}";
+        // Formato de respuesta de Gemini API
+        String mockResponse = "{\"candidates\": [{\"content\": {\"parts\": [{\"text\": \"Resumen de archivo\"}]}}]}";
 
         when(extractService.extractText(mockFile)).thenReturn(extractedText);
         when(restTemplate.exchange(

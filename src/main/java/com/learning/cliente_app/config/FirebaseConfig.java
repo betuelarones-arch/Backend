@@ -3,14 +3,13 @@ package com.learning.cliente_app.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.springframework.context.annotation.Profile;
 
-@Configuration
+// @Configuration - DESHABILITADO TEMPORALMENTE: Falta serviceAccountKey.json
 @Profile("!test")
 public class FirebaseConfig {
 
