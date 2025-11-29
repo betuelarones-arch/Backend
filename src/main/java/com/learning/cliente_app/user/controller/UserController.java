@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.learning.cliente_app.user.service.UserService;
+import com.learning.cliente_app.user.dto.ActualizarPerfilRequest;
 import com.learning.cliente_app.user.dto.UsuarioDTO;
 import com.learning.cliente_app.user.dto.LoginRequest;
 import com.learning.cliente_app.user.dto.RecoverRequest;
@@ -79,6 +81,62 @@ public class UserController {
         logger.info("Support message received: {}", request.getDescription());
         // Aquí podrías almacenar el mensaje o enviarlo por email
         return ResponseEntity.ok("Mensaje de soporte recibido");
+    }
+
+    /**
+     * Actualizar perfil del usuario.
+     * PUT /api/usuarios/perfil
+     * Header: userId (simulando autenticación)
+     */
+    @PutMapping("/perfil")
+    public ResponseEntity<UsuarioDTO> actualizarPerfil(
+            @RequestHeader("userId") Long userId,
+            @RequestBody ActualizarPerfilRequest request) {
+        try {
+            UsuarioDTO actualizado = userService.actualizarPerfil(userId, request);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("Error al actualizar perfil: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Subir foto de perfil.
+     * POST /api/usuarios/foto (multipart)
+     * Header: userId (simulando autenticación)
+     */
+    @PostMapping("/foto")
+    public ResponseEntity<UsuarioDTO> subirFoto(
+            @RequestHeader("userId") Long userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            UsuarioDTO actualizado = userService.subirFotoPerfil(userId, file);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("Error al subir foto: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Eliminar cuenta del usuario.
+     * DELETE /api/usuarios/cuenta
+     * Header: userId (simulando autenticación)
+     */
+    @DeleteMapping("/cuenta")
+    public ResponseEntity<String> eliminarCuenta(@RequestHeader("userId") Long userId) {
+        try {
+            userService.eliminarCuenta(userId);
+            return ResponseEntity.ok("Cuenta eliminada exitosamente");
+        } catch (Exception e) {
+            logger.error("Error al eliminar cuenta: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

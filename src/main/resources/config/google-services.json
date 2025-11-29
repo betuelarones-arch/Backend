@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "452062305690",
+    "project_id": "learning-cave-e9980",
+    "storage_bucket": "learning-cave-e9980.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452062305690:android:f065e5c0d4ed063565ae23",
+        "android_client_info": {
+          "package_name": "com.trabajo.learnincave"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "452062305690-trc2al12986qslovq99igjgq8doiacas.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trabajo.learnincave",
+            "certificate_hash": "3920f50dd26a7f50a092cc2be38ee071c810f737"
+          }
+        },
+        {
+          "client_id": "452062305690-tesq28ups2ul85ni7fiulsu53u7v1tsi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnE7QPr5kcAv1uhaH7lcUoGMQ40m8pL3k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "452062305690-tesq28ups2ul85ni7fiulsu53u7v1tsi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

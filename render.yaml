@@ -1,0 +1,105 @@
+# ============================================
+# Configuración de Render.com
+# ============================================
+# Este archivo define todos los servicios para Render
+# Render lo detectará automáticamente al conectar el repositorio
+
+services:
+  # ============================================
+  # Backend (Spring Boot)
+  # ============================================
+  - type: web
+    name: cliente-app-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: free  # Cambiar a 'starter' o 'standard' en producción
+    
+    # Variables de entorno
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: cliente-app-db
+          property: connectionString
+      
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: cliente-app-db
+          property: user
+      
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: cliente-app-db
+          property: password
+      
+      - key: GEMINI_API_KEY
+        sync: false  # Configurar manualmente en dashboard
+      
+      - key: APP_BASE_URL
+        value: https://cliente-app-backend.onrender.com  # Cambiar por tu URL
+      
+      - key: JAVA_OPTS
+        value: -Xmx512m -Xms256m
+      
+      - key: SERVER_PORT
+        value: 8080
+      
+      - key: APP_UPLOAD_DIR
+        value: /opt/render/project/src/uploads/profile-photos
+    
+    # Health check
+    healthCheckPath: /actuator/health
+    
+    # Comandos de build (Render usa el Dockerfile automáticamente)
+    # Build command se ejecuta automáticamente con Docker
+    
+    # Configuración de auto-deploy
+    autoDeploy: true
+    
+    # Branch para deploy
+    branch: main  # o master, según tu repositorio
+
+# ============================================
+# Base de Datos PostgreSQL
+# ============================================
+databases:
+  - name: cliente-app-db
+    databaseName: clienteapp
+    user: clienteapp_user
+    plan: free  # Cambiar a 'starter' o 'standard' en producción
+    region: oregon
+    
+    # PostgreSQL version
+    ipAllowList: []  # Vacío = acceso desde cualquier IP de Render
+
+# ============================================
+# NOTAS IMPORTANTES
+# ============================================
+# 1. Free tier tiene limitaciones:
+#    - El servicio se suspende después de 15 min de inactividad
+#    - Base de datos free expira después de 90 días
+#    - 750 horas de cómputo por mes
+#
+# 2. Para producción real, usar planes pagos:
+#    - Web Service: plan 'starter' ($7/mes) o superior
+#    - PostgreSQL: plan 'starter' ($7/mes) o superior
+#
+# 3. Variables de entorno sensibles:
+#    - GEMINI_API_KEY debe configurarse manualmente en el dashboard
+#    - Render las encripta automáticamente
+#
+# 4. Archivos persistentes:
+#    - Free tier NO tiene almacenamiento persistente
+#    - Para fotos de perfil, usar plan pago con disk
+#    - O migrar a S3/Cloudinary
+#
+# 5. Auto-deploy:
+#    - Configurado para deploy automático en push a 'main'
+#    - Cambiar 'autoDeploy: false' para deploy manual
+#
+# 6. Regiones disponibles:
+#    - oregon, frankfurt, singapore, ohio
+#    - Elegir la más cercana a tus usuarios

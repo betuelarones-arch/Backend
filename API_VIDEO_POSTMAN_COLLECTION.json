@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "API Video - Cliente Backend",
+    "description": "Colección de endpoints para generación de videos con IA",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Generar video desde documento",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "document",
+              "type": "file",
+              "src": [],
+              "description": "Archivo PDF, DOC, DOCX o TXT"
+            },
+            {
+              "key": "voice",
+              "value": "es-ES",
+              "type": "text",
+              "description": "Voz opcional (es-ES, es-MX, en-US, etc.)"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/video/generate-from-document",
+          "host": ["{{base_url}}"],
+          "path": ["api", "video", "generate-from-document"]
+        },
+        "description": "Genera un video desde un documento. El sistema extrae el texto, genera un guion con IA y crea el video."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Generar video desde prompt",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "prompt",
+              "value": "Explica qué es la inteligencia artificial y sus aplicaciones principales",
+              "type": "text",
+              "description": "Prompt o tema del video"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": [],
+              "description": "Imagen opcional para el video"
+            },
+            {
+              "key": "voice",
+              "value": "es-ES",
+              "type": "text",
+              "description": "Voz opcional"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/video/generate-from-prompt",
+          "host": ["{{base_url}}"],
+          "path": ["api", "video", "generate-from-prompt"]
+        },
+        "description": "Genera un video desde un prompt. El sistema genera un guion con IA y crea el video."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Generar video con guion",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "script",
+              "value": "Bienvenidos a este video educativo. En este video aprenderemos sobre...",
+              "type": "text",
+              "description": "Guion del video"
+            },
+            {
+              "key": "file",
+              "type": "file",
+              "src": [],
+              "description": "Archivo de imagen opcional"
+            },
+            {
+              "key": "voice",
+              "value": "es-ES",
+              "type": "text",
+              "description": "Voz opcional"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/video/generate",
+          "host": ["{{base_url}}"],
+          "path": ["api", "video", "generate"]
+        },
+        "description": "Genera un video usando un guion ya proporcionado."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Verificar estado del video",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/video/status/{{video_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "video", "status", "{{video_id}}"]
+        },
+        "description": "Consulta el estado de un video en proceso de generación."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "video_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+

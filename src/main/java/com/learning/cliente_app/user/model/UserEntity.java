@@ -34,6 +34,9 @@ public class UserEntity {
     @Column(name = "fecha_creacion")
     private OffsetDateTime fechaCreacion;
 
+    @Column(name = "foto_perfil_url", length = 500)
+    private String fotoPerfilUrl;
+
     public UserEntity() {
     }
 
@@ -46,21 +49,75 @@ public class UserEntity {
         this.verified = verified;
     }
 
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public String getApellido() { return apellido; }
-    public String getEmail() { return email; }
-    public String getPasswordHash() { return passwordHash; }
-    public boolean isVerified() { return verified; }
-    public String getRol() { return rol; }
-    public OffsetDateTime getFechaCreacion() { return fechaCreacion; }
+    public Long getId() {
+        return id;
+    }
 
-    public void setId(Long id) { this.id = id; }
-    public void setName(String name) { this.name = name; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
-    public void setEmail(String email) { this.email = email; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public void setVerified(boolean verified) { this.verified = verified; }
-    public void setRol(String rol) { this.rol = rol; }
-    public void setFechaCreacion(OffsetDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    public String getName() {
+        return name;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public OffsetDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public String getFotoPerfilUrl() {
+        return fotoPerfilUrl;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public void setFechaCreacion(OffsetDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public void setFotoPerfilUrl(String fotoPerfilUrl) {
+        this.fotoPerfilUrl = fotoPerfilUrl;
+    }
 }
