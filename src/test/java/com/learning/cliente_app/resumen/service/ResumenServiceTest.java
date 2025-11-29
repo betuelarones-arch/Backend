@@ -1,9 +1,12 @@
 package com.learning.cliente_app.resumen.service;
 
 import com.learning.cliente_app.podcast.service.ExtractService;
+import com.learning.cliente_app.resumen.repository.ResumenRepository;
+import com.learning.cliente_app.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
@@ -27,13 +30,20 @@ public class ResumenServiceTest {
     private RestTemplate restTemplate;
 
     @Mock
+    private ResumenRepository resumenRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private MultipartFile mockFile;
 
+    @InjectMocks
     private ResumenService resumenService;
 
     @BeforeEach
     void setUp() {
-        resumenService = new ResumenService(extractService, restTemplate);
+        // resumenService is injected by @InjectMocks
     }
 
     @Test

@@ -240,6 +240,19 @@ Ver [Guía Completa de Render](RENDER_DEPLOYMENT.md) para instrucciones detallad
 | POST | `/unirse` | Unirse a clase |
 | GET | `/unirse/{codigo}` | Unirse vía link/QR |
 
+### 📊 Dashboard (`/api/v1/dashboard`)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/resumen?userId={id}` | Obtener resumen de progreso, estadísticas y actividad reciente |
+
+### ⏰ Recordatorios (`/api/v1/recordatorios`)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `?userId={id}` | Listar recordatorios |
+| POST | `?userId={id}` | Crear recordatorio |
+| DELETE | `/{id}` | Eliminar recordatorio |
+| PATCH | `/{id}/completar` | Marcar como completado/pendiente |
+
 ⭐ **Nuevo en v1.1.0**
 
 ---

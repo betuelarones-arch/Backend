@@ -24,20 +24,41 @@ public class ResumenService {
     private final ExtractService extractService;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final com.learning.cliente_app.resumen.repository.ResumenRepository resumenRepository;
+    private final com.learning.cliente_app.user.repository.UserRepository userRepository;
 
-    public ResumenService(ExtractService extractService, RestTemplate restTemplate) {
+    public ResumenService(ExtractService extractService, RestTemplate restTemplate,
+            com.learning.cliente_app.resumen.repository.ResumenRepository resumenRepository,
+            com.learning.cliente_app.user.repository.UserRepository userRepository) {
         this.extractService = extractService;
         this.restTemplate = restTemplate;
+        this.resumenRepository = resumenRepository;
+        this.userRepository = userRepository;
     }
 
     /**
      * Genera un resumen a partir de un texto dado.
      */
-    public String resumirTexto(String texto) {
+    public String resumirTexto(String texto, Long userId) {
         if (texto == null || texto.trim().isEmpty()) {
             throw new IllegalArgumentException("El texto no puede estar vacío");
         }
-        return callGeminiSummaryAPI(texto);
+        String resumen = callGeminiSummaryAPI(texto);
+
+        if (userId != null) {
+            userRepository.findById(userId).ifPresent(user -> {
+                com.learning.cliente_app.resumen.model.ResumenEntity entity = new com.learning.cliente_app.resumen.model.ResumenEntity(
+                        user, "Resumen Generado", resumen);
+                resumenRepository.save(entity);
+            });
+        }
+
+        return resumen;
+    }
+
+    // Overload for backward compatibility if needed, or just update callers.
+    public String resumirTexto(String texto) {
+        return resumirTexto(texto, null);
     }
 
     /**

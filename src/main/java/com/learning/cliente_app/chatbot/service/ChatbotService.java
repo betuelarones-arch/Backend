@@ -134,8 +134,34 @@ public class ChatbotService {
         conversaciones.remove(conversacionId);
     }
 
+    public List<Conversacion> getRecentChats(Long userId) {
+        if (userId == null)
+            return new ArrayList<>();
+        return conversaciones.values().stream()
+                .filter(c -> userId.equals(c.getUserId()))
+                .sorted((c1, c2) -> c2.getLastActivity().compareTo(c1.getLastActivity()))
+                .limit(5)
+                .toList();
+    }
+
     public List<Mensaje> obtenerHistorial(String conversacionId) {
         Conversacion conversacion = conversaciones.get(conversacionId);
         return conversacion != null ? conversacion.getMensajes() : new ArrayList<>();
+    }
+
+    public long countChatsByUserId(Long userId) {
+        if (userId == null)
+            return 0;
+        return conversaciones.values().stream()
+                .filter(c -> userId.equals(c.getUserId()))
+                .count();
+    }
+
+    public String crearNuevaConversacion(Long userId) {
+        String id = UUID.randomUUID().toString();
+        Conversacion conversacion = new Conversacion(id);
+        conversacion.setUserId(userId);
+        conversaciones.put(id, conversacion);
+        return id;
     }
 }

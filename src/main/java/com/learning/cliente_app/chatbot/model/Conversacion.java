@@ -13,17 +13,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Conversacion {
     private String id;
-    private List<Mensaje> mensajes;
-    private LocalDateTime createdAt;
-    private LocalDateTime lastActivity;
-    
+    private List<Mensaje> mensajes = new ArrayList<>();
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime lastActivity = LocalDateTime.now();
+    private Long userId;
+
     public Conversacion(String id) {
         this.id = id;
         this.mensajes = new ArrayList<>();
         this.createdAt = LocalDateTime.now();
         this.lastActivity = LocalDateTime.now();
     }
-    
+
     public void agregarMensaje(Mensaje mensaje) {
         this.mensajes.add(mensaje);
         this.lastActivity = LocalDateTime.now();
