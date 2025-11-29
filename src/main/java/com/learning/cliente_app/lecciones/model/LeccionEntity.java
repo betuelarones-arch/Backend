@@ -23,8 +23,7 @@ public class LeccionEntity {
     @Column(name = "url_ppt")
     private String urlPpt;
 
-    @Column(name = "ppt_blob")
-    @Lob
+    @Column(name = "ppt_blob", columnDefinition = "bytea")
     private byte[] pptBlob;
 
     @Column(name = "url_video")
@@ -37,23 +36,75 @@ public class LeccionEntity {
     private OffsetDateTime fechaCreacion;
 
     // getters and setters
-    public Long getId() { return id; }
-    public Long getIdCurso() { return idCurso; }
-    public String getTitulo() { return titulo; }
-    public String getResumen() { return resumen; }
-    public String getUrlPpt() { return urlPpt; }
-    public byte[] getPptBlob() { return pptBlob; }
-    public String getUrlVideo() { return urlVideo; }
-    public Integer getNumero() { return numero; }
-    public OffsetDateTime getFechaCreacion() { return fechaCreacion; }
+    public Long getId() {
+        return id;
+    }
 
-    public void setId(Long id) { this.id = id; }
-    public void setIdCurso(Long idCurso) { this.idCurso = idCurso; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-    public void setResumen(String resumen) { this.resumen = resumen; }
-    public void setUrlPpt(String urlPpt) { this.urlPpt = urlPpt; }
-    public void setPptBlob(byte[] pptBlob) { this.pptBlob = pptBlob; }
-    public void setUrlVideo(String urlVideo) { this.urlVideo = urlVideo; }
-    public void setNumero(Integer numero) { this.numero = numero; }
-    public void setFechaCreacion(OffsetDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    public Long getIdCurso() {
+        return idCurso;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getResumen() {
+        return resumen;
+    }
+
+    public String getUrlPpt() {
+        return urlPpt;
+    }
+
+    public byte[] getPptBlob() {
+        return pptBlob;
+    }
+
+    public String getUrlVideo() {
+        return urlVideo;
+    }
+
+    public Integer getNumero() {
+        return numero;
+    }
+
+    public OffsetDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setIdCurso(Long idCurso) {
+        this.idCurso = idCurso;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setResumen(String resumen) {
+        this.resumen = resumen;
+    }
+
+    public void setUrlPpt(String urlPpt) {
+        this.urlPpt = urlPpt;
+    }
+
+    public void setPptBlob(byte[] pptBlob) {
+        this.pptBlob = pptBlob;
+    }
+
+    public void setUrlVideo(String urlVideo) {
+        this.urlVideo = urlVideo;
+    }
+
+    public void setNumero(Integer numero) {
+        this.numero = numero;
+    }
+
+    public void setFechaCreacion(OffsetDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
 }
