@@ -26,8 +26,11 @@ public class ChatbotService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${openai.api.key}")
-    private String openaiApiKey;
+    @Value("${gemini.api.key}")
+    private String geminiApiKey;
+
+    @Value("${gemini.api.host}")
+    private String geminiApiHost;
 
     private static final String SYSTEM_PROMPT = "Eres un asistente educativo especializado. SOLO puedes responder preguntas relacionadas con:\n"
             +
@@ -41,9 +44,7 @@ public class ChatbotService {
             "alguna consulta relacionada con educación.";
 
     public ChatbotService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
-        this.webClient = webClientBuilder
-                .baseUrl("https://api.openai.com/v1")
-                .build();
+        this.webClient = webClientBuilder.build();
         this.objectMapper = objectMapper;
     }
 
@@ -60,51 +61,64 @@ public class ChatbotService {
 
         conversacion.agregarMensaje(new Mensaje("user", mensajeUsuario));
 
-        String respuesta = obtenerRespuestaOpenAI(conversacion).block();
+        String respuesta = obtenerRespuestaGemini(conversacion).block();
 
-        conversacion.agregarMensaje(new Mensaje("assistant", respuesta));
+        conversacion.agregarMensaje(new Mensaje("model", respuesta)); // Gemini usa 'model' en lugar de 'assistant'
 
         return new ChatResponse(conversacionId, respuesta, true, LocalDateTime.now());
     }
 
-    private Mono<String> obtenerRespuestaOpenAI(Conversacion conversacion) {
+    private Mono<String> obtenerRespuestaGemini(Conversacion conversacion) {
         try {
             ObjectNode requestBody = objectMapper.createObjectNode();
-            requestBody.put("model", "gpt-4o-mini");
-            requestBody.put("temperature", 0.7);
-            requestBody.put("max_tokens", 800);
 
-            ArrayNode messages = requestBody.putArray("messages");
+            // System Instruction (Prompt del sistema)
+            ObjectNode systemInstruction = requestBody.putObject("systemInstruction");
+            ArrayNode systemParts = systemInstruction.putArray("parts");
+            systemParts.addObject().put("text", SYSTEM_PROMPT);
 
-            // Mensaje del sistema
-            ObjectNode systemMessage = messages.addObject();
-            systemMessage.put("role", "system");
-            systemMessage.put("content", SYSTEM_PROMPT);
+            // Contents (Historial de conversación)
+            ArrayNode contents = requestBody.putArray("contents");
 
-            // Historial de la conversación
             for (Mensaje msg : conversacion.getMensajes()) {
-                ObjectNode message = messages.addObject();
-                message.put("role", msg.getRol());
-                message.put("content", msg.getContenido());
+                ObjectNode content = contents.addObject();
+                // Mapear roles: 'assistant' -> 'model', 'user' -> 'user'
+                String role = "assistant".equals(msg.getRol()) ? "model" : msg.getRol();
+                content.put("role", role);
+
+                ArrayNode parts = content.putArray("parts");
+                parts.addObject().put("text", msg.getContenido());
             }
 
+            // Configuración de generación (opcional)
+            ObjectNode generationConfig = requestBody.putObject("generationConfig");
+            generationConfig.put("temperature", 0.7);
+            generationConfig.put("maxOutputTokens", 800);
+
+            String url = geminiApiHost + "/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+
             return webClient.post()
-                    .uri("/chat/completions")
-                    .header("Authorization", "Bearer " + openaiApiKey)
+                    .uri(url)
                     .header("Content-Type", "application/json")
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(JsonNode.class)
                     .map(response -> {
-                        return response.path("choices")
-                                .get(0)
-                                .path("message")
-                                .path("content")
-                                .asText();
+                        try {
+                            return response.path("candidates")
+                                    .get(0)
+                                    .path("content")
+                                    .path("parts")
+                                    .get(0)
+                                    .path("text")
+                                    .asText();
+                        } catch (Exception e) {
+                            return "Error al procesar la respuesta de Gemini.";
+                        }
                     })
                     .onErrorResume(error -> {
-                        return Mono
-                                .just("Lo siento, hubo un error al procesar tu mensaje. Por favor intenta nuevamente.");
+                        return Mono.just(
+                                "Lo siento, hubo un error al conectar con el servicio de IA. Por favor intenta nuevamente.");
                     });
 
         } catch (Exception e) {
