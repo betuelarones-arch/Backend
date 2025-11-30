@@ -16,21 +16,24 @@ public class Pregunta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "archivo_origen")
     private String archivoOrigen;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "pregunta", columnDefinition = "TEXT")
     private String pregunta;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "opciones", columnDefinition = "TEXT")
     private String opciones; // JSON String en BD
 
+    @Column(name = "respuesta_correcta")
     private String respuestaCorrecta;
 
     @Transient
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // Constructores
-    public Pregunta() {}
+    public Pregunta() {
+    }
 
     public Pregunta(String archivoOrigen, String pregunta, List<String> opciones, String respuestaCorrecta) {
         this.archivoOrigen = archivoOrigen;
@@ -87,7 +90,8 @@ public class Pregunta {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(opciones, new TypeReference<List<String>>() {});
+            return objectMapper.readValue(opciones, new TypeReference<List<String>>() {
+            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error al parsear opciones: " + e.getMessage(), e);
         }
