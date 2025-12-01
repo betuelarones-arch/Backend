@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.learning.cliente_app.chatbot.dto.ChatResponse;
 import com.learning.cliente_app.chatbot.model.Conversacion;
 import com.learning.cliente_app.chatbot.model.Mensaje;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -26,12 +25,6 @@ public class ChatbotService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${gemini.api.key}")
-    private String geminiApiKey;
-
-    @Value("${gemini.api.host}")
-    private String geminiApiHost;
-
     private static final String SYSTEM_PROMPT = "Eres un asistente educativo especializado. SOLO puedes responder preguntas relacionadas con:\n"
             +
             "- Educación, aprendizaje y enseñanza\n" +
@@ -43,8 +36,8 @@ public class ChatbotService {
             "responde amablemente que solo puedes ayudar con temas educativos y pregunta si tienen " +
             "alguna consulta relacionada con educación.";
 
-    public ChatbotService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
-        this.webClient = webClientBuilder.build();
+    public ChatbotService(WebClient openAiWebClient, ObjectMapper objectMapper) {
+        this.webClient = openAiWebClient;
         this.objectMapper = objectMapper;
     }
 
@@ -61,59 +54,63 @@ public class ChatbotService {
 
         conversacion.agregarMensaje(new Mensaje("user", mensajeUsuario));
 
-        String respuesta = obtenerRespuestaGemini(conversacion).block();
+        String respuesta = obtenerRespuestaOpenAI(conversacion).block();
 
-        conversacion.agregarMensaje(new Mensaje("model", respuesta)); // Gemini usa 'model' en lugar de 'assistant'
+        conversacion.agregarMensaje(new Mensaje("assistant", respuesta));
 
         return new ChatResponse(conversacionId, respuesta, true, LocalDateTime.now());
     }
 
-    private Mono<String> obtenerRespuestaGemini(Conversacion conversacion) {
+    private Mono<String> obtenerRespuestaOpenAI(Conversacion conversacion) {
         try {
             ObjectNode requestBody = objectMapper.createObjectNode();
 
-            // System Instruction (Prompt del sistema)
-            ObjectNode systemInstruction = requestBody.putObject("systemInstruction");
-            ArrayNode systemParts = systemInstruction.putArray("parts");
-            systemParts.addObject().put("text", SYSTEM_PROMPT);
+            // Model
+            requestBody.put("model", "gpt-4o-mini");
 
-            // Contents (Historial de conversación)
-            ArrayNode contents = requestBody.putArray("contents");
+            // Messages
+            ArrayNode messages = requestBody.putArray("messages");
 
+            // System prompt
+            messages.addObject()
+                    .put("role", "system")
+                    .put("content", SYSTEM_PROMPT);
+
+            // Conversation history
             for (Mensaje msg : conversacion.getMensajes()) {
-                ObjectNode content = contents.addObject();
-                // Mapear roles: 'assistant' -> 'model', 'user' -> 'user'
-                String role = "assistant".equals(msg.getRol()) ? "model" : msg.getRol();
-                content.put("role", role);
-
-                ArrayNode parts = content.putArray("parts");
-                parts.addObject().put("text", msg.getContenido());
+                ObjectNode message = messages.addObject();
+                // Map roles if needed, but we now use 'assistant' internally
+                String role = "model".equals(msg.getRol()) ? "assistant" : msg.getRol();
+                message.put("role", role);
+                message.put("content", msg.getContenido());
             }
 
-            // Configuración de generación (opcional)
-            ObjectNode generationConfig = requestBody.putObject("generationConfig");
-            generationConfig.put("temperature", 0.7);
-            generationConfig.put("maxOutputTokens", 800);
+            // Configuration (optional)
+            requestBody.put("temperature", 0.7);
+            requestBody.put("max_tokens", 800);
 
-            String url = geminiApiHost + "/v1beta/models/gemini-2.0-flash-exp:generateContent?key=" + geminiApiKey;
-
+            // URL is already configured in WebClient
             return webClient.post()
-                    .uri(url)
-                    .header("Content-Type", "application/json")
+                    .uri("/chat/completions") // Base URL is in config, so we just need the path? Or full URL?
+                    // OpenAIConfig sets baseUrl to openai.api.url which is
+                    // https://api.openai.com/v1/chat/completions
+                    // Wait, if baseUrl is .../chat/completions, then uri should be empty or just
+                    // query params.
+                    // Let's check OpenAIConfig again.
+                    // openai.api.url=https://api.openai.com/v1/chat/completions
+                    // So baseUrl is the full endpoint.
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(JsonNode.class)
                     .map(response -> {
                         try {
-                            return response.path("candidates")
+                            return response.path("choices")
                                     .get(0)
+                                    .path("message")
                                     .path("content")
-                                    .path("parts")
-                                    .get(0)
-                                    .path("text")
                                     .asText();
                         } catch (Exception e) {
-                            return "Error al procesar la respuesta de Gemini.";
+                            return "Error al procesar la respuesta de OpenAI.";
                         }
                     })
                     .onErrorResume(error -> {

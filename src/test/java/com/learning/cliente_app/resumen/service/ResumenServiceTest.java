@@ -6,6 +6,12 @@ import com.learning.cliente_app.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -93,5 +99,33 @@ public class ResumenServiceTest {
         RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> resumenService.resumirArchivo(mockFile));
         assertTrue(exception.getMessage().contains("Error al procesar el archivo"));
+    }
+    
+    @SpringBootTest
+    @ActiveProfiles("test")
+    @ExtendWith(SpringExtension.class)
+    public static class OpenAIConnectionTest {
+        
+        @Autowired(required = false)
+        private ResumenService resumenService;
+        
+        @Test
+        void testOpenAIConnection() {
+            // Skip test if running in CI environment without API key
+            if (System.getenv("CI") != null && System.getenv("CI").equalsIgnoreCase("true")) {
+                return;
+            }
+            
+            try {
+                String testText = "Este es un texto de prueba para verificar la conexión con OpenAI.";
+                String result = resumenService.resumirTexto(testText);
+                assertNotNull(result);
+                assertFalse(result.trim().isEmpty(), "La respuesta de la API no debe estar vacía");
+                System.out.println("Conexión exitosa con OpenAI. Respuesta recibida: " + result);
+            } catch (Exception e) {
+                System.err.println("Error al conectar con OpenAI: " + e.getMessage());
+                fail("No se pudo conectar con OpenAI. Verifica tu API key y conexión a internet. Error: " + e.getMessage());
+            }
+        }
     }
 }

@@ -18,11 +18,11 @@ import java.util.Map;
 @Service
 public class GeneradorPreguntasService {
 
-    @Value("${gemini.api.key}")
-    private String GEMINI_API_KEY;
+    @Value("${openai.api.key}")
+    private String OPENAI_API_KEY;
 
-    @Value("${gemini.api.host:https://generativelanguage.googleapis.com}")
-    private String GEMINI_API_HOST;
+    @Value("${openai.api.host:https://api.openai.com/v1}")
+    private String OPENAI_API_HOST;
 
     // Configurables desde application.properties
     @Value("${app.preguntas.minimo:5}")
@@ -71,25 +71,25 @@ public class GeneradorPreguntasService {
                 %s
                 """, numPreguntas, numPreguntas, texto);
 
-        // Construir request body para Gemini
-        Map<String, Object> part = new HashMap<>();
-        part.put("text", prompt);
-
-        Map<String, Object> content = new HashMap<>();
-        content.put("parts", new Object[] { part });
+        // Construir request body para OpenAI
+        Map<String, Object> message = new HashMap<>();
+        message.put("role", "user");
+        message.put("content", prompt);
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("contents", new Object[] { content });
+        requestBody.put("model", "gpt-4o-mini");
+        requestBody.put("messages", new Object[] { message });
 
         String body = objectMapper.writeValueAsString(requestBody);
 
         // Construir URL con API key
-        String apiUrl = GEMINI_API_HOST + "/v1beta/models/gemini-2.0-flash-exp:generateContent?key=" + GEMINI_API_KEY;
+        String apiUrl = OPENAI_API_HOST + "/chat/completions";
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(apiUrl))
                 .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + OPENAI_API_KEY)
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
@@ -99,19 +99,17 @@ public class GeneradorPreguntasService {
             throw new RuntimeException("Error al generar preguntas: HTTP " + resp.statusCode() + " - " + resp.body());
         }
 
-        // Parsear respuesta de Gemini
+        // Parsear respuesta de OpenAI
         JsonNode json = objectMapper.readTree(resp.body());
-        JsonNode candidates = json.path("candidates");
-        if (candidates.isEmpty() || !candidates.isArray()) {
-            throw new RuntimeException("Respuesta inesperada de Gemini: " + resp.body());
+        JsonNode choices = json.path("choices");
+        if (choices.isEmpty() || !choices.isArray()) {
+            throw new RuntimeException("Respuesta inesperada de OpenAI: " + resp.body());
         }
 
-        String resultado = candidates
+        String resultado = choices
                 .get(0)
+                .path("message")
                 .path("content")
-                .path("parts")
-                .get(0)
-                .path("text")
                 .asText();
 
         // Limpiar markdown si existe

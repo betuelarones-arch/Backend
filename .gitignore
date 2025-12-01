@@ -31,7 +31,6 @@ logs/
 Thumbs.db
 
 # Docker
-docker-compose.override.ymlcliente_app.jar
 target/
 cliente_app.jar
 target/

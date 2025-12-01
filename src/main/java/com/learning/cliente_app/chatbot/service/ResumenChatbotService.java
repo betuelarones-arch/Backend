@@ -15,11 +15,11 @@ import java.util.Map;
 @Service
 public class ResumenChatbotService {
 
-    @Value("${gemini.api.key}")
-    private String GEMINI_API_KEY;
+    @Value("${openai.api.key}")
+    private String OPENAI_API_KEY;
 
-    @Value("${gemini.api.host:https://generativelanguage.googleapis.com}")
-    private String GEMINI_API_HOST;
+    @Value("${openai.api.host:https://api.openai.com/v1}")
+    private String OPENAI_API_HOST;
 
     private final ExtractService extractService;
     private final RestTemplate restTemplate;
@@ -37,7 +37,7 @@ public class ResumenChatbotService {
         if (texto == null || texto.trim().isEmpty()) {
             throw new IllegalArgumentException("El texto no puede estar vacío");
         }
-        return callGeminiSummaryAPI(texto);
+        return callOpenAISummaryAPI(texto);
     }
 
     /**
@@ -49,62 +49,58 @@ public class ResumenChatbotService {
             if (extractedText == null || extractedText.trim().isEmpty()) {
                 throw new RuntimeException("No se pudo extraer texto del archivo o está vacío");
             }
-            return callGeminiSummaryAPI(extractedText);
+            return callOpenAISummaryAPI(extractedText);
         } catch (Exception e) {
             throw new RuntimeException("Error al procesar el archivo para resumen: " + e.getMessage(), e);
         }
     }
 
-    private String callGeminiSummaryAPI(String text) {
+    private String callOpenAISummaryAPI(String text) {
         try {
-            // Gemini API endpoint - usando gemini-2.0-flash-exp
-            String apiUrl = GEMINI_API_HOST + "/v1beta/models/gemini-2.0-flash-exp:generateContent?key="
-                    + GEMINI_API_KEY;
+            // OpenAI API endpoint
+            String apiUrl = OPENAI_API_HOST + "/chat/completions";
 
             String prompt = "Genera un resumen conciso y bien estructurado del siguiente texto. " +
                     "Resalta los puntos clave y las conclusiones principales:\n\n" + text;
 
-            // Construir el request body según el formato de Gemini
-            Map<String, Object> part = new HashMap<>();
-            part.put("text", prompt);
-
-            Map<String, Object> content = new HashMap<>();
-            content.put("parts", new Object[] { part });
+            // Construir el request body según el formato de OpenAI
+            Map<String, Object> message = new HashMap<>();
+            message.put("role", "user");
+            message.put("content", prompt);
 
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("contents", new Object[] { content });
+            requestBody.put("model", "gpt-4o-mini");
+            requestBody.put("messages", new Object[] { message });
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(OPENAI_API_KEY);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                throw new RuntimeException("Error al generar resumen con Gemini — HTTP " + response.getStatusCode());
+                throw new RuntimeException("Error al generar resumen con OpenAI — HTTP " + response.getStatusCode());
             }
 
-            // Parsear respuesta de Gemini
+            // Parsear respuesta de OpenAI
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
-            JsonNode candidates = jsonResponse.get("candidates");
-            if (candidates != null && candidates.isArray() && candidates.size() > 0) {
-                JsonNode content_node = candidates.get(0).get("content");
-                if (content_node != null) {
-                    JsonNode parts = content_node.get("parts");
-                    if (parts != null && parts.isArray() && parts.size() > 0) {
-                        JsonNode textNode = parts.get(0).get("text");
-                        if (textNode != null) {
-                            return textNode.asText().trim();
-                        }
+            JsonNode choices = jsonResponse.get("choices");
+            if (choices != null && choices.isArray() && choices.size() > 0) {
+                JsonNode messageNode = choices.get(0).get("message");
+                if (messageNode != null) {
+                    JsonNode contentNode = messageNode.get("content");
+                    if (contentNode != null) {
+                        return contentNode.asText().trim();
                     }
                 }
             }
 
-            throw new RuntimeException("Respuesta inesperada de Gemini: " + response.getBody());
+            throw new RuntimeException("Respuesta inesperada de OpenAI: " + response.getBody());
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al conectar con Gemini para resumen: " + e.getMessage(), e);
+            throw new RuntimeException("Error al conectar con OpenAI para resumen: " + e.getMessage(), e);
         }
     }
 }
