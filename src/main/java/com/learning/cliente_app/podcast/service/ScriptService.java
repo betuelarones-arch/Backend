@@ -44,7 +44,8 @@ public class ScriptService {
     private String callGeminiScriptAPI(String content) {
         try {
             // Construir URL con API key
-            String apiUrl = GEMINI_API_HOST + "/v1beta/models/gemini-pro:generateContent?key=" + GEMINI_API_KEY;
+            String apiUrl = GEMINI_API_HOST + "/v1beta/models/gemini-2.0-flash-exp:generateContent?key="
+                    + GEMINI_API_KEY;
 
             // Construir request body para Gemini
             Map<String, Object> part = new HashMap<>();

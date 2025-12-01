@@ -95,7 +95,7 @@ public class ChatbotService {
             generationConfig.put("temperature", 0.7);
             generationConfig.put("maxOutputTokens", 800);
 
-            String url = geminiApiHost + "/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+            String url = geminiApiHost + "/v1beta/models/gemini-2.0-flash-exp:generateContent?key=" + geminiApiKey;
 
             return webClient.post()
                     .uri(url)

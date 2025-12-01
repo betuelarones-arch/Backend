@@ -78,8 +78,9 @@ public class ResumenService {
 
     private String callGeminiSummaryAPI(String text) {
         try {
-            // Gemini API endpoint - usando gemini-pro
-            String apiUrl = GEMINI_API_HOST + "/v1beta/models/gemini-pro:generateContent?key=" + GEMINI_API_KEY;
+            // Gemini API endpoint - usando gemini-2.0-flash-exp
+            String apiUrl = GEMINI_API_HOST + "/v1beta/models/gemini-2.0-flash-exp:generateContent?key="
+                    + GEMINI_API_KEY;
 
             String prompt = "Genera un resumen conciso y bien estructurado del siguiente texto. " +
                     "Resalta los puntos clave y las conclusiones principales:\n\n" + text;
