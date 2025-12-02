@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/video")
-public class AudioController {
+public class VideoController {
 
     private final VideoService videoService;
 
@@ -33,7 +33,7 @@ public class AudioController {
      */
     @PostMapping(
             value = "/generate-from-document",
-            consumes = { MediaType.MULTIPART_FORM_DATA_VALUE },
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> generateVideoFromDocument(
@@ -61,7 +61,7 @@ public class AudioController {
      */
     @PostMapping(
             value = "/generate-from-prompt",
-            consumes = { MediaType.MULTIPART_FORM_DATA_VALUE },
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> generateVideoFromPrompt(
@@ -88,7 +88,7 @@ public class AudioController {
      * 🔹 Endpoint original para generar video con guion ya proporcionado
      * Mantiene compatibilidad con el endpoint anterior
      */
-    @PostMapping( value = "/generate", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/generate", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> generateVideo(
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart("script") String scriptText,
@@ -139,7 +139,7 @@ public class AudioController {
 
     @PostMapping(
             value = "/generate-podcast",
-            consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<?> generatePodcast(
             @RequestPart("document") MultipartFile document) {
