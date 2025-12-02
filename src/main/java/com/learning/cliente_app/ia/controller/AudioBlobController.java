@@ -1,5 +1,7 @@
 package com.learning.cliente_app.ia.controller;
 
+import com.learning.cliente_app.ia.dto.BlobUploadResponse;
+import com.learning.cliente_app.ia.dto.ErrorResponse;
 import com.learning.cliente_app.ia.model.AudioIaEntity;
 import com.learning.cliente_app.ia.repository.AudioIaRepository;
 import org.springframework.http.HttpStatus;
@@ -75,35 +77,5 @@ public class AudioBlobController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponse("Error al descargar audio: " + e.getMessage()));
         }
-    }
-
-    // Response DTOs
-    public static class BlobUploadResponse {
-        public String message;
-        public Long entityId;
-        public Long fileSize;
-        public String contentType;
-
-        public BlobUploadResponse(String message, Long entityId, Long fileSize, String contentType) {
-            this.message = message;
-            this.entityId = entityId;
-            this.fileSize = fileSize;
-            this.contentType = contentType;
-        }
-
-        public String getMessage() { return message; }
-        public Long getEntityId() { return entityId; }
-        public Long getFileSize() { return fileSize; }
-        public String getContentType() { return contentType; }
-    }
-
-    public static class ErrorResponse {
-        public String error;
-
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-
-        public String getError() { return error; }
     }
 }
